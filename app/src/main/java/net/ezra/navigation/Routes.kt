@@ -7,6 +7,9 @@ const val ROUTE_SPLASH = "splash"
 const val ROUTE_SHOP = "shop"
 const val ROUTE_INSERT_PRODUCT = "insert_product"
 const val ROUTE_VIEW_PRODUCTS = "view_products"
+const val ROUTE_LOGIN = "login"
+const val ROUTE_REGISTER = "register"
+const val ROUTE_DASHBOARD = "dashboard"
 
 
 

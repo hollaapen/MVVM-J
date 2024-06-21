@@ -54,6 +54,7 @@ import net.ezra.navigation.ROUTE_HOME
 data class Product(
     var id: String = "",
     val name: String = "",
+    val quantity: String = "",
     val description: String ="",
     val price: Double = 0.0,
     var imageUrl: String = ""
@@ -123,7 +124,7 @@ fun ProductListScreen(navController: NavController, products: List<Product>) {
                     Text(text = "No products found", modifier = Modifier.align(Alignment.CenterHorizontally))
                 } else {
                     // Products list
-                    LazyVerticalGrid(columns = GridCells.Fixed(2)) {
+                    LazyVerticalGrid(columns = GridCells.Fixed(1)) {
                         items(productList.take(displayedProductCount)) { product ->
                             ProductListItem(product) {
                                 navController.navigate("productDetail/${product.id}")
@@ -172,16 +173,19 @@ fun ProductListItem(product: Product, onItemClick: (String) -> Unit) {
             // Product Details
             Column {
                 Text(text = product.name)
+                Text(text = product.quantity)
                 Text(text = "Price: ${product.price}")
             }
+
         }
     }
 }
 
+@Suppress("DEPRECATION")
 private suspend fun fetchProducts(onSuccess: (List<Product>) -> Unit, onError: () -> Unit) {
     val firestore = Firebase.firestore
     try {
-        val snapshot = firestore.collection("products").get().await()
+        val snapshot = firestore.collection("events").get().await()
         val productList = snapshot.documents.mapNotNull { doc ->
             val product = doc.toObject<Product>()
             product?.id = doc.id
@@ -195,7 +199,7 @@ private suspend fun fetchProducts(onSuccess: (List<Product>) -> Unit, onError: (
 
 suspend fun fetchProduct(productId: String, onSuccess: (Product?) -> Unit) {
     val firestore = Firebase.firestore
-    val docRef = firestore.collection("products").document(productId)
+    val docRef = firestore.collection("events").document(productId)
     val snapshot = docRef.get().await()
     val product = snapshot.toObject<Product>()
     onSuccess(product)

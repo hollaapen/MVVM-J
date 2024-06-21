@@ -36,6 +36,7 @@ import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import net.ezra.navigation.ROUTE_HOME
+import net.ezra.navigation.ROUTE_VIEW_PRODUCTS
 import java.util.UUID
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
@@ -44,11 +45,13 @@ fun InsertProductScreen(navController: NavController, onProductAdded: () -> Unit
     var productName by remember { mutableStateOf("") }
     var productDescription by remember { mutableStateOf("") }
     var productPrice by remember { mutableStateOf("") }
+    var productQuantity by remember { mutableStateOf("") }
     var productImageUri by remember { mutableStateOf<Uri?>(null) }
 
     var productNameError by remember { mutableStateOf(false) }
     var productDescriptionError by remember { mutableStateOf(false) }
     var productPriceError by remember { mutableStateOf(false) }
+    var productQuantityError by remember { mutableStateOf(false) }
     var productImageError by remember { mutableStateOf(false) }
 
     var isUploading by remember { mutableStateOf(false) }
@@ -85,7 +88,9 @@ fun InsertProductScreen(navController: NavController, onProductAdded: () -> Unit
                 }
             }
             Spacer(modifier = Modifier.height(16.dp))
-            Button(onClick = { launcher.launch("image/*") }) {
+            Button(
+                onClick = { launcher.launch("image/*") }
+            ) {
                 Text("Select Image")
             }
             Spacer(modifier = Modifier.height(16.dp))
@@ -93,6 +98,14 @@ fun InsertProductScreen(navController: NavController, onProductAdded: () -> Unit
                 value = productName,
                 onValueChange = { productName = it },
                 label = { Text("Product Name") },
+                isError = productNameError,
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            TextField(
+                value = productQuantity,
+                onValueChange = { productQuantity = it },
+                label = { Text("Product Quantity") },
                 isError = productNameError,
                 modifier = Modifier.fillMaxWidth()
             )
@@ -127,6 +140,9 @@ fun InsertProductScreen(navController: NavController, onProductAdded: () -> Unit
             if (productImageError) {
                 Text("Product Image is required", color = Color.Red)
             }
+            if (productQuantityError) {
+                Text("Product Quantity is required", color = Color.Red)
+            }
 
             if (!isUploading) {
                 Button(
@@ -134,15 +150,17 @@ fun InsertProductScreen(navController: NavController, onProductAdded: () -> Unit
                         productNameError = productName.isBlank()
                         productDescriptionError = productDescription.isBlank()
                         productPriceError = productPrice.isBlank()
+                        productQuantityError = productQuantity.isBlank()
                         productImageError = productImageUri == null
 
-                        if (!productNameError && !productDescriptionError && !productPriceError && !productImageError) {
+                        if (!productNameError && !productDescriptionError && !productPriceError && !productImageError && !productQuantityError) {
                             isUploading = true
                             addProductToFirestore(
                                 navController,
                                 onProductAdded,
                                 productName,
                                 productDescription,
+                                productQuantity,
                                 productPrice.toDouble(),
                                 productImageUri,
                                 onUploadComplete = { isUploading = false }
@@ -171,6 +189,7 @@ private fun addProductToFirestore(
     onProductAdded: () -> Unit,
     productName: String,
     productDescription: String,
+    productQuantity: String,
     productPrice: Double,
     productImageUri: Uri?,
     onUploadComplete: () -> Unit
@@ -183,18 +202,19 @@ private fun addProductToFirestore(
         "name" to productName,
         "description" to productDescription,
         "price" to productPrice,
+        "quantity" to productQuantity,
         "imageUrl" to ""
     )
 
-    firestore.collection("products").document(productId)
+    firestore.collection("events").document(productId)
         .set(productData)
         .addOnSuccessListener {
             uploadImageToStorage(productId, productImageUri) { imageUrl ->
-                firestore.collection("products").document(productId)
+                firestore.collection("events").document(productId)
                     .update("imageUrl", imageUrl)
                     .addOnSuccessListener {
                         Toast.makeText(navController.context, "Product added successfully!", Toast.LENGTH_SHORT).show()
-                        navController.navigate(ROUTE_HOME)
+                        navController.navigate(ROUTE_VIEW_PRODUCTS)
                         onProductAdded()
                         onUploadComplete()
                     }
@@ -217,7 +237,7 @@ private fun uploadImageToStorage(productId: String, imageUri: Uri?, onSuccess: (
     }
 
     val storageRef = Firebase.storage.reference
-    val imagesRef = storageRef.child("products/$productId.jpg")
+    val imagesRef = storageRef.child("events/$productId.jpg")
 
     imagesRef.putFile(imageUri)
         .addOnSuccessListener {

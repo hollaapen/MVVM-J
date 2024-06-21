@@ -85,17 +85,22 @@ fun ProductDetailScreen(navController: NavController, productId: String) {
                     .background(Color(0xff9AEDC9)),
             ) {
                 product?.let {
-                    Column(modifier = Modifier.padding(16.dp)) {
+                    Column(
+                        modifier = Modifier.padding(16.dp)
+                    ) {
                         Image(
                             painter = rememberAsyncImagePainter(it.imageUrl),
                             contentDescription = null,
                             modifier = Modifier.size(60.dp)
                         )
-                        Text(text = it.name, style = MaterialTheme.typography.h5)
+                        Text(text = it.name,)
                         Spacer(modifier = Modifier.height(8.dp))
-                        Text(text = "Price: ${it.price}", style = MaterialTheme.typography.subtitle1)
+                        Text(text = "Price: ${it.price}")
                         Spacer(modifier = Modifier.height(8.dp))
-                        Text(text = it.description, style = MaterialTheme.typography.body1)
+                        Text(text = it.description)
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(text = it.quantity)
+
                     }
                 }
             }

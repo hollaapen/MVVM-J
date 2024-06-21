@@ -17,7 +17,10 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import net.ezra.navigation.ROUTE_ABOUT
 import net.ezra.navigation.ROUTE_CONTACT
+import net.ezra.navigation.ROUTE_DASHBOARD
 import net.ezra.navigation.ROUTE_INSERT_PRODUCT
+import net.ezra.navigation.ROUTE_LOGIN
+import net.ezra.navigation.ROUTE_REGISTER
 import net.ezra.navigation.ROUTE_SHOP
 import net.ezra.navigation.ROUTE_VIEW_PRODUCTS
 
@@ -86,6 +89,26 @@ fun HomeScreen(navController: NavHostController) {
                     navController.navigate(ROUTE_CONTACT)
                 },
             text = "Contact"
+        )
+
+        Spacer(modifier = Modifier.height(10.dp))
+
+        Text(
+            modifier = Modifier
+                .clickable {
+                    navController.navigate(ROUTE_LOGIN)
+                },
+            text = "Go to login"
+        )
+
+        Spacer(modifier = Modifier.height(10.dp))
+
+        Text(
+            modifier = Modifier
+                .clickable {
+                    navController.navigate(ROUTE_REGISTER)
+                },
+            text = "Go to  register"
         )
 
 
