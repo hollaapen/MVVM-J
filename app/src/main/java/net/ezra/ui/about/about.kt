@@ -20,7 +20,6 @@ fun AboutScreen(navController: NavHostController) {
 
 
     Column {
-        Text(text = "about")
 
         Text(
             modifier = Modifier
